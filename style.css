@@ -1,0 +1,21 @@
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    background-color: #81d4fa;
+}
+
+#regions_div {
+    width: 100%;
+}
+
+#regions_div path {
+    /* stroke-width: 10px; */
+    /* stroke: #6699cc; */
+}
+
+#regions_div path:hover {
+    /* stroke-width: 10px; */
+    stroke: #6699cc;
+}
