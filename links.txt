@@ -1,0 +1,2 @@
+http://www.fao.org/countryprofiles/iso3list/en/
+https://developers.google.com/chart/interactive/docs/gallery/geochart

@@ -20,7 +20,6 @@ function drawRegionsMap() {
       ['England', 1],
     ])
 
-    // https://developers.google.com/chart/interactive/docs/gallery/geochart
     var options = {
         // colorAxis: {colors: ['#6f6', '#f66']},
         colorAxis: {colors: ['#dd6', '#f66']},
