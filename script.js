@@ -1,45 +1,107 @@
-google.charts.load('current', {
-    'packages': ['geochart'],
-    // Note: you will need to get a mapsApiKey for your project.
-    // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
-    // Hopefully, you won't stoll it, right?
-    'mapsApiKey': 'AIzaSyBuZPXmiSUiYc-GjrTXKl9cevtgIVjv8Xw'
-})
+const MISCLICK = 3
 
-google.charts.setOnLoadCallback(drawRegionsMap)
+const infoTitle = document.getElementById('info-title')
+const infoReason = document.getElementById('info-reason')
+const infoResult = document.getElementById('info-result')
+const infoDescription = document.getElementById('info-description')
 
-function drawRegionsMap() {
-    var data = google.visualization.arrayToDataTable([
-      ['Country', 'Ethnic Tension'],
-      ['Russia', 2],
-      ['USA', 2],
-      ['Northern Corea', 2],
-      ['Germany', 2],
+////////// DEGUB //////////
+let logClickCoordinates = false
 
-      ['France', 1],
-      ['England', 1],
-    ])
 
-    var options = {
-        // colorAxis: {colors: ['#6f6', '#f66']},
-        colorAxis: {colors: ['#dd6', '#f66']},
-        backgroundColor: '#81d4fa',
+// for further access
+const clickCircles = []
+const clickPoint = []
 
-        tooltip: {
-            showColorCode: true,
-            textStyle: {
-                color: '#6699cc',
-                fontName: 'monospace',
-                fontSize: '16'
-            },
-        },
-    }
+// create clicking points
+for (let it in data) {
+    const clickPoint = document.createElement('div')
+    clickPoint.style.left = data[it].x + '%'
+    clickPoint.style.top = data[it].y * bg.offsetHeight / window.innerHeight + '%'
+    clickPoint.className = 'clickPoint'
+    document.body.append(clickPoint)
+    clickPoint.src = data[it]
 
-    var chart = new google.visualization.GeoChart(document.getElementById('regions_div'))
+    clickCircles.push(clickPoint)
 
-    google.visualization.events.addListener(chart, 'select', () => {
-        console.log( data.og[chart.getSelection()[0].row].c[0] )
+    clickPoint.addEventListener('mousedown', (e) => {
+        spawnInfo(data[it])
     })
 
-    chart.draw(data, options)
+    const clickCircle = document.createElement('div')
+    clickCircle.style.left = data[it].x + '%'
+    clickCircle.style.top = data[it].y * bg.offsetHeight / window.innerHeight + '%'
+    clickCircle.className = 'clickCircle'
+    document.body.append(clickCircle)
+    clickCircle.src = data[it]
+
+    clickCircles.push(clickCircle)
+}
+
+
+// start pulse service
+setInterval(() => {
+    // reposition points if window size changes
+    for (let that in clickPoint) {
+        clickPoint[that].style.left = clickPoint[that].src.x + '%'
+        clickPoint[that].style.top = clickPoint[that].src.y * bg.offsetHeight / window.innerHeight + '%'
+    }
+
+    for (let that in clickCircles) {
+        const it = clickCircles[that]
+        it.style.height = '0'
+        it.style.width = '0'
+        it.style.opacity = '1'
+        it.style.transition = ''
+
+        // reposition points if window size changes
+        it.style.left = it.src.x + '%'
+        it.style.top = it.src.y * bg.offsetHeight / window.innerHeight + '%'
+    }
+
+    setTimeout(() => {
+        for (let that in clickCircles) {
+            const it = clickCircles[that]
+            it.style.height = '30px'
+            it.style.width = '30px'
+            it.style.opacity = '0'
+            it.style.transition = 'all 1000ms ease'
+        }
+    })
+}, 2000)
+
+
+// remove info
+bg.addEventListener('mousedown', (e) => {
+    info.style.left = '-100%'
+    info.style.top = '-100%'
+    info.style.opacity = '0'
+
+    const x = e.clientX / bg.offsetWidth * 100
+    const y = (e.clientY + document.body.scrollTop) / bg.offsetHeight * 100
+
+    if (logClickCoordinates)
+        console.log(`x: ${x} %\ny: ${y} %`)
+})
+
+
+// open info
+function spawnInfo(region) {
+    infoTitle.innerText = region.title
+    infoReason.innerText = region.reason
+    infoResult.innerText = region.result
+    infoDescription.innerText = region.description
+
+    let y = region.y / 100 * bg.offsetHeight
+    let x = region.x / 100 * bg.offsetWidth
+
+    if (y + info.offsetHeight > window.innerHeight)
+        y = window.innerHeight - info.offsetHeight
+
+    if (x + info.offsetWidth > window.innerWidth)
+        x = window.innerWidth - info.offsetWidth
+
+    info.style.top = y
+    info.style.left = x
+    info.style.opacity = '1'
 }
